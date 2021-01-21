@@ -4,21 +4,8 @@
 
 #include "todo.h"
 #include "datemap.h"
+#include "date.h"
 
-void printCurrentDate() {
-	time_t t = time(NULL);
-	struct tm *tm = localtime(&t);
-	char s[64];
-	strftime(s, sizeof(s), "%c", tm);
-	printf("%s\n", s);
-}
-
-void getTodos() {
-	printf("===== Murdoch's TODOs =====\n");
-	printCurrentDate();
-	printf("Today's todos:\n");
-	// read from the todos file 
-}
 
 // Write the DateMapNodes to a file in preorder (root, left, right).  This 
 // should mean that when we read them, they will recreate the BST, right?
@@ -72,48 +59,93 @@ DateMapNode *readDateMapNodes(FILE *file) {
 }
 
 void cleanUpTree(DateMapNode *root) {
-	// TODO: Remove everything
-	//while (root != NULL) {
-	//	removeNode(root, root->date);
-	//}
-	//removeNode(root, root->date);
+	while (root != NULL) {
+		root = removeNode(root, root->date, 1);
+	}
 }
 
-int main(int argc, char* argv) {
-	//if (argc == 1) {
-	//	getTodos();
-	//}
+void printCurrentDate() {
+	time_t t = time(NULL);
+	struct tm *tm = localtime(&t);
+	char s[64];
+	strftime(s, sizeof(s), "%c", tm);
+	printf("%s\n", s);
+}
+
+// TODO: date functions in their own file?
+Date getTodaysDate() {
+	time_t t = time(NULL);
+	struct tm *tm = localtime(&t);
+	Date d = {tm->tm_mday, tm->tm_mon, tm->tm_year+1900};
+	return d;
+}
+
+void outputTodos(DateMapNode *root, Date date) {
+	printf("===== Murdoch's TODOs =====\n");
+	printCurrentDate();
+	printf("Today's todos:\n");
+
+	// read from the todos file 
+	DateMapNode *foundNode = search(root, date);
+	if (foundNode == NULL) {
+		return;
+	}
+	printNodeTodos(foundNode);
+}
+
+int main(int argc, char* argv[]) {
 	// TODO: Create some DateMapNodes
 	// Test writing and reading them.
-	Todo todo1 = {0, "TODO 1", 31, 1, 2001};
-	Todo todo2 = {0, "TODO 2", 12, 1, 2001};
+	//Todo todo1 = {0, "TODO 1", 31, 1, 2001};
+	//Todo todo2 = {0, "TODO 2", 12, 1, 2001};
+	//Todo todo3 = {0, "TODO 3", 12, 1, 2001};
 
-	Todo todos1[] = {todo1, todo2};
-	Todo todos2[] = {todo2};
-	Date date1 = {31, 1, 2001};
-	Date date2 = {12, 1, 2001};
+	////Todo todos1[] = {todo1, todo2};
+	////Todo todos2[] = {todo3};
+	//Todo *todos1 = malloc(sizeof(Todo)*2);
+	//Todo *todos2 = malloc(sizeof(Todo)*1);
+	//todos1[0] = todo1;
+	//todos1[1] = todo2;
+	//todos2[0] = todo3;
+	//Date date1 = {31, 1, 2001};
+	//Date date2 = {12, 1, 2001};
+	//Date date3 = {21, 0, 2021};
 
-	DateMapNode node1;
-	node1 = (DateMapNode) {date1, todos1, 2, NULL, NULL};
-	DateMapNode node2;
-	node2 = (DateMapNode) {date2, todos2, 1, NULL, &node1};
+	//DateMapNode *node1 = malloc(sizeof(DateMapNode));
+	//*node1 = (DateMapNode) {date3, todos1, 2, NULL, NULL};
+	//DateMapNode *node2 = malloc(sizeof(DateMapNode));
+	//*node2 = (DateMapNode) {date2, todos2, 1, NULL, node1};
 
-	DateMapNode *root = &node2;
-	
-	FILE *file = fopen("test.dat", "wb");
-	writeDateMapNodes(file, root);
-	fclose(file);
-
-	cleanUpTree(root);
-	
-	file = fopen("test.dat", "rb");
-	DateMapNode *root2 = readDateMapNodes(file);
-	fclose(file);
-	
-	printInOrder(root2);
-	printf("%d\n", root2->numTodos);
+	//DateMapNode *root = node2;
+	//
+	//FILE *file = fopen("test.dat", "wb");
+	//writeDateMapNodes(file, root);
+	//fclose(file);
+	//
+	//cleanUpTree(root);
+	//
+	//file = fopen("test.dat", "rb");
+	//DateMapNode *root2 = readDateMapNodes(file);
+	//fclose(file);
+	//
+	//printInOrder(root2);
+	//printf("%d\n", root2->numTodos);
 	//printf("%s\n", root2->todos[0]);
-	for (int i = 0; i < root2->numTodos; i++) {
-		printf("DMN1: %s\n", root2->todos[i].description);
+	//for (int i = 0; i < root2->numTodos; i++) {
+	//	printf("DMN1: %s\n", root2->todos[i].description);
+	//}
+	
+	if (argc == 1) {
+		FILE *file = fopen("test.dat", "rb");
+		DateMapNode *root = readDateMapNodes(file);
+		fclose(file);
+		outputTodos(root, getTodaysDate());
+	} else if (argc == 2) {
+		FILE *file = fopen("test.dat", "rb");
+		DateMapNode *root = readDateMapNodes(file);
+		fclose(file);
+		
+		Date d = stringToDate(argv[1]);
+		outputTodos(root, d);
 	}
 }

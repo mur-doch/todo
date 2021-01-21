@@ -1,27 +1,9 @@
+#ifndef DATEMAP_H
+#define DATEMAP_H
+
 #include "todo.h"
+#include "date.h"
 #include <stdlib.h>
-
-typedef struct {
-	int day;
-	int month;
-	int year;
-} Date;
-
-int compareDates(Date date1, Date date2) {
-	int dateInt1 = date1.year * 10000 + date1.month * 100 + date1.day;
-	int dateInt2 = date2.year * 10000 + date2.month * 100 + date2.day;
-
-	if (dateInt1 < dateInt2) {
-		return -1;
-	} else if (dateInt1 == dateInt2) {
-		return 0;
-	}
-	return 1;
-}
-
-void printDate(Date date) {
-	printf("%d/%d/%d", date.year, date.month, date.day);
-}
 
 typedef struct DateMapNode DateMapNode;
 
@@ -34,10 +16,15 @@ struct DateMapNode {
 };
 
 DateMapNode* search(DateMapNode *root, Date date) {
-	int cRes = compareDates(root->date, date);
-	if (root == NULL || cRes == 0) {
+	if (root == NULL) {
 		return root;
-	} else if (cRes > 0) {
+	} 
+	
+	int cRes = compareDates(root->date, date);
+	if (cRes == 0) {
+		return root;
+	}
+	else if (cRes > 0) {
 		// means date < root->date
 		return search(root->left, date);
 	} else {
@@ -79,17 +66,20 @@ DateMapNode *insertNode(DateMapNode *root, Date date) {
 	return root;
 }
 
-DateMapNode *removeNode(DateMapNode *root, Date date) {
+DateMapNode *removeNode(DateMapNode *root, Date date, int freeTodos) {
 	int cRes = compareDates(root->date, date);
 	if (root == NULL) {
 		return NULL;
 	} else if (cRes > 0) {
-		root->left = removeNode(root->left, date);
+		root->left = removeNode(root->left, date, 1);
 	} else if (cRes < 0) {
-		root->right = removeNode(root->right, date);
+		root->right = removeNode(root->right, date, 1);
 	} else {
 		if (root->left == NULL && root->right == NULL) {
-			free(root->todos);
+			// TODO: Should only remove the todos if the node is
+			// not being moved.
+			if (root->todos != NULL && freeTodos == 1)
+				free(root->todos);
 			free(root);
 			return NULL;
 		} else if (root->left == NULL || root->right == NULL) {
@@ -99,14 +89,17 @@ DateMapNode *removeNode(DateMapNode *root, Date date) {
 			} else {
 				temp = root->left;
 			}
-			free(root->todos);
+			if (root->todos != NULL && freeTodos == 1)
+				free(root->todos);
 			free(root);
 			return temp;
 		} else {
 			DateMapNode *temp = findMinimum(root);
+			root->numTodos = temp->numTodos;
 			root->todos = temp->todos;
 			root->date = temp->date;
-			removeNode(root->right, temp->date);
+			// Don't remove the todos because we're using them in temp
+			removeNode(root->right, temp->date, 0);
 		}
 	}
 
@@ -144,84 +137,12 @@ DateMapNode *insertExistingNode(DateMapNode *root, DateMapNode newNode) {
 	return root;
 }
 
-/*
-DateMapNode *getDateMapNode(DateMapNode *root, Date date) {
-	//int cRes = compareDates(root->date, date);
-	//if (cRes == -1) {
-	//	return getDateMapNode(root->left, date);
-	//} else if (cRes == 1) {
-	//	return getDateMapNode(root->right, date);
-	//}
-	//return root;
-	
-	DateMapNode *cur = root;
-	while (cur != NULL) {
-		int cRes = compareDates(cur->date, date);
-		if (cRes == 0) {
-			return cur;
-		} else if (cRes < 0) {
-			// root->date < date
-			cur = cur->right;
-		} else if (cRes > 0) {
-			// root->date > date
-			cur = cur->left;
+void printNodeTodos(DateMapNode *node) {
+	if (node != NULL) {
+		for (int i = 0; i < node->numTodos; i++) {
+			printTodo(&node->todos[i]);
 		}
 	}
-	return cur;
 }
 
-
-void addDateMapNode(DateMapNode **rootPtrPtr, DateMapNode *toAdd) {
-	// TODO
-	if (rootPtrPtr == NULL) {
-		return;
-	}
-	// need the check above because otherwise we're dereferencing a pointer to nothing
-	// what we really meant was that the rootPtr (or *rootPtrPtr) if null, should be
-	// set to toadd
-	DateMapNode *cur = *rootPtrPtr;
-	DateMapNode **curP = rootPtrPtr;
-	while (cur != NULL) {
-		int cRes = compareDates(cur->date, toAdd->date);
-		if (cRes == -1) {
-			// cur->date < toAdd->date
-			cur = cur->right;
-			curP = &cur->right;
-		} else if (cRes == 1) {
-			// cur->date > toAdd->date
-			cur = cur->left;
-			curP = &cur->left;
-		} 
-		// TODO: want to merge the todos
-		//else if (cRes == 0) {
-		//
-		//}
-	}
-
-	//if (curP != NULL) {
-	//	*curP = toAdd;
-	//} else {
-	//	*rootPtrPtr = toAdd;
-	//}
-	*curP = toAdd;
-}
-
-void removeDateMapNode(DateMapNode *root, Date toRemove) {
-	// basically to remove this from the tree we need to find its parent and set 
-	// the reference to null
-	// we only need to free() it if we use malloc to set it... we don't know if we'll be 
-	// doing that yet.
-	// TODO: Do we need to free() toRemove?  It's basically all going to be in 
-	// the main of this project.
-	
-	DateMapNode *cur = root;
-	while (1) {
-		int cRes = compareDates(root->date, date);
-		if (cRes == -1) {
-			return getDateMapNode(root->left, date);
-		} else if (cRes == 1) {
-			return getDateMapNode(root->right, date);
-		}
-		return root;
-	}
-}*/
+#endif
