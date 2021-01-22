@@ -127,6 +127,62 @@ DateMapNode *addTodo(DateMapNode *root) {
 	return root;
 }
 
+DateMapNode *removeTodo(DateMapNode *root) {
+	printf("Enter the date for this todo (dd/mm/yyyy):\n");
+	char dateString[11];
+	fgets(dateString, 11, stdin);
+	getchar();
+	
+	// get the corresponding node
+	// present a list of todos that can be removed
+	// prompt the user to pick one of the todos
+	
+	Date d = stringToDate(dateString);
+	DateMapNode *node = search(root, d);
+	if (node == NULL) {
+		return root;
+	}
+	
+	printf("Pick a todo to remove:\n");
+	for (int i = 0; i < node->numTodos; i++) {
+		printf("\t%d. %s\n", i, node->todos[i].description);
+	}
+	
+	int choice;
+	printf("Enter the index of the todo to remove: ");
+	scanf("%d", &choice);
+
+	node = removeNodeTodo(node, choice);
+	
+	return root;
+}
+
+DateMapNode *completeTodo(DateMapNode *root) {
+	printf("Enter the date for this todo (dd/mm/yyyy):\n");
+	char dateString[11];
+	fgets(dateString, 11, stdin);
+	getchar();
+	
+	Date d = stringToDate(dateString);
+	DateMapNode *node = search(root, d);
+	if (node == NULL) {
+		return root;
+	}
+	
+	printf("Pick a todo to complete:\n");
+	for (int i = 0; i < node->numTodos; i++) {
+		printf("\t%d. %s\n", i, node->todos[i].description);
+	}
+	
+	int choice;
+	printf("Enter the index of the todo to complete: ");
+	scanf("%d", &choice);
+
+	node = completeNodeTodo(node, choice);
+	
+	return root;
+}
+
 int main(int argc, char* argv[]) {
 	if (argc == 1) {
 		DateMapNode *root = loadFromFile();
@@ -135,8 +191,16 @@ int main(int argc, char* argv[]) {
 		if (strcmp(argv[1], "add") == 0) {
 			DateMapNode *root = loadFromFile();
 			root = addTodo(root);
-			// TODO: Not saving for some reason
-			outputTodos(root, (Date) {21, 0, 2021});
+			writeToFile(root);
+			cleanUpTree(root);
+		} else if (strcmp(argv[1], "remove") == 0) {
+			DateMapNode *root = loadFromFile();
+			root = removeTodo(root);
+			writeToFile(root);
+			cleanUpTree(root);
+		} else if (strcmp(argv[1], "complete") == 0) {
+			DateMapNode *root = loadFromFile();
+			root = completeTodo(root);
 			writeToFile(root);
 			cleanUpTree(root);
 		} else {

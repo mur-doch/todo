@@ -175,4 +175,39 @@ DateMapNode *addTodoNode(DateMapNode *root, Todo newTodo) {
 	return root;
 }
 
+DateMapNode *removeNodeTodo(DateMapNode *node, int todoIndex) {
+	if (node == NULL || todoIndex < 0 || todoIndex >= node->numTodos) {
+		return node;
+	}
+	
+	// TODO: I think the above could be made more efficient using memcpy.
+	Todo *newTodos = malloc(sizeof(Todo)*(node->numTodos - 1));
+	int offset = 0;
+	for (int i = 0; i < node->numTodos; i++) {
+		if (i != todoIndex) {
+			newTodos[i - offset] = node->todos[i];
+		} else {
+			offset++;
+		}
+	}
+
+	node->numTodos -= 1;
+	free(node->todos);
+	node->todos = newTodos;
+
+	return node;
+}
+
+DateMapNode *completeNodeTodo(DateMapNode *node, int todoIndex) {
+	if (node == NULL || todoIndex < 0 || todoIndex >= node->numTodos) {
+		return node;
+	}
+	
+	for (int i = 0; i < node->numTodos; i++) {
+		node->todos[i].completed = 1;
+	}
+
+	return node;
+}
+
 #endif
