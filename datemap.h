@@ -76,8 +76,6 @@ DateMapNode *removeNode(DateMapNode *root, Date date, int freeTodos) {
 		root->right = removeNode(root->right, date, 1);
 	} else {
 		if (root->left == NULL && root->right == NULL) {
-			// TODO: Should only remove the todos if the node is
-			// not being moved.
 			if (root->todos != NULL && freeTodos == 1)
 				free(root->todos);
 			free(root);
@@ -143,6 +141,38 @@ void printNodeTodos(DateMapNode *node) {
 			printTodo(&node->todos[i]);
 		}
 	}
+}
+
+DateMapNode *addTodoNode(DateMapNode *root, Todo newTodo) {
+	if (root == NULL) {
+		DateMapNode *p;
+		p = malloc(sizeof(DateMapNode));
+		Todo *todos = malloc(sizeof(Todo));
+		todos[0] = newTodo;
+
+		p->date = newTodo.date;
+		p->todos = todos;
+		p->left = NULL;
+		p->right = NULL;
+		p->numTodos = 1;
+		return p;
+	}
+
+	int cRes = compareDates(root->date, newTodo.date);
+	if (cRes > 0) {
+		root->left = addTodoNode(root->left, newTodo);
+	} else if (cRes < 0) {
+		root->right = addTodoNode(root->right, newTodo);
+	} else {
+		// if we've found the existing node
+		int size = root->numTodos + 1;
+		Todo *todo = root->todos;
+		root->todos = realloc(todo, sizeof(Todo)*size);
+		root->todos[size - 1] = newTodo;
+		root->numTodos = size;
+	}
+
+	return root;
 }
 
 #endif

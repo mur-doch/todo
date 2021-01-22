@@ -3,12 +3,12 @@
 
 #include <stdio.h>
 
+#include "date.h"
+
 typedef struct {
 	int completed;
 	char description[201];
-	int day;
-	int month;
-	int year;
+	Date date;
 } Todo;
 
 void printTodo(Todo *todo) {
