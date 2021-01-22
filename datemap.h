@@ -180,7 +180,6 @@ DateMapNode *removeNodeTodo(DateMapNode *node, int todoIndex) {
 		return node;
 	}
 	
-	// TODO: I think the above could be made more efficient using memcpy.
 	Todo *newTodos = malloc(sizeof(Todo)*(node->numTodos - 1));
 	int offset = 0;
 	for (int i = 0; i < node->numTodos; i++) {

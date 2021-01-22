@@ -194,6 +194,7 @@ int main(int argc, char* argv[]) {
 			DateMapNode *root = loadFromFile();
 			Date d = stringToDate(argv[1]);
 			outputTodos(root, d);
+			cleanUpTree(root);
 		}
 	}
 }
