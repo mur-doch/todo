@@ -157,7 +157,7 @@ DateMapNode *removeTodo(DateMapNode *root) {
 	return root;
 }
 
-DateMapNode *completeTodo(DateMapNode *root) {
+DateMapNode *completeTodo(DateMapNode *root, int completeVal) {
 	printf("Enter the date for this todo (dd/mm/yyyy):\n");
 	char dateString[11];
 	fgets(dateString, 11, stdin);
@@ -178,7 +178,7 @@ DateMapNode *completeTodo(DateMapNode *root) {
 	printf("Enter the index of the todo to complete: ");
 	scanf("%d", &choice);
 
-	node = completeNodeTodo(node, choice);
+	node = completeNodeTodo(node, choice, completeVal);
 	
 	return root;
 }
@@ -200,7 +200,12 @@ int main(int argc, char* argv[]) {
 			cleanUpTree(root);
 		} else if (strcmp(argv[1], "complete") == 0) {
 			DateMapNode *root = loadFromFile();
-			root = completeTodo(root);
+			root = completeTodo(root, 1);
+			writeToFile(root);
+			cleanUpTree(root);
+		} else if (strcmp(argv[1], "ncomplete") == 0) {
+			DateMapNode *root = loadFromFile();
+			root = completeTodo(root, 0);
 			writeToFile(root);
 			cleanUpTree(root);
 		} else {

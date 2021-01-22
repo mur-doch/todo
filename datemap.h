@@ -198,13 +198,13 @@ DateMapNode *removeNodeTodo(DateMapNode *node, int todoIndex) {
 	return node;
 }
 
-DateMapNode *completeNodeTodo(DateMapNode *node, int todoIndex) {
+DateMapNode *completeNodeTodo(DateMapNode *node, int todoIndex, int completeVal) {
 	if (node == NULL || todoIndex < 0 || todoIndex >= node->numTodos) {
 		return node;
 	}
 	
 	for (int i = 0; i < node->numTodos; i++) {
-		node->todos[i].completed = 1;
+		node->todos[i].completed = completeVal;
 	}
 
 	return node;
