@@ -2,6 +2,7 @@
 A basic todo list tracker implemented in C.
 
 Supports the following commands: 
+
 todo                // prints the todos for the current date
 
 todo <dd/mm/yyyy>   // prints the todos for the passed date
