@@ -2,7 +2,6 @@
 #define TODO_H
 
 #include <stdio.h>
-
 #include "date.h"
 
 typedef struct {
@@ -11,14 +10,6 @@ typedef struct {
 	Date date;
 } Todo;
 
-void printTodo(Todo *todo) {
-	printf("\t- ");
-	
-	if (todo->completed) {
-		printf("[DONE] ");
-	}
-
-	printf("%s\n", todo->description);
-}
+void printTodo(Todo *todo);
 
 #endif
