@@ -203,9 +203,7 @@ DateMapNode *completeNodeTodo(DateMapNode *node, int todoIndex, int completeVal)
 		return node;
 	}
 	
-	for (int i = 0; i < node->numTodos; i++) {
-		node->todos[i].completed = completeVal;
-	}
+	node->todos[todoIndex].completed = completeVal;
 
 	return node;
 }

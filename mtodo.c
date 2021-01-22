@@ -13,11 +13,7 @@ void writeDateMapNodes(FILE *file, DateMapNode *root) {
 	if (root != NULL && file != NULL) {
 		fwrite(&(root->date), sizeof(Date), 1, file);
 		fwrite(&(root->numTodos), sizeof(int), 1, file);
-		for (int i = 0; i < root->numTodos; i++) {
-			fwrite(&(root->todos[i]), sizeof(Todo), 1, file);
-		}
-		// TODO: Does this work?
-		// fwrite(root->todos, sizeof(Todo), numTodos, file);
+		fwrite(root->todos, sizeof(Todo), root->numTodos, file);
 
 		writeDateMapNodes(file, root->left);
 		writeDateMapNodes(file, root->right);
@@ -36,9 +32,7 @@ DateMapNode *readDateMapNodes(FILE *file) {
 			fread(&numTodos, sizeof(int), 1, file);
 			
 			Todo *todos = malloc(sizeof(Todo)*numTodos);
-			for (int i = 0; i < numTodos; i++) {
-				fread(&(todos[i]), sizeof(Todo), 1, file);
-			}
+			fread(todos, sizeof(Todo), numTodos, file);
 			
 			DateMapNode newNode = {rDate, todos, numTodos, NULL, NULL};
 			root = insertExistingNode(root, newNode);
@@ -76,14 +70,6 @@ void writeToFile(DateMapNode *root) {
 	FILE *file = fopen("test.dat", "wb");
 	writeDateMapNodes(file, root);
 	fclose(file);
-}
-
-// TODO: date functions in their own file?
-Date getTodaysDate() {
-	time_t t = time(NULL);
-	struct tm *tm = localtime(&t);
-	Date d = {tm->tm_mday, tm->tm_mon, tm->tm_year+1900};
-	return d;
 }
 
 void outputTodos(DateMapNode *root, Date date) {
@@ -132,10 +118,6 @@ DateMapNode *removeTodo(DateMapNode *root) {
 	char dateString[11];
 	fgets(dateString, 11, stdin);
 	getchar();
-	
-	// get the corresponding node
-	// present a list of todos that can be removed
-	// prompt the user to pick one of the todos
 	
 	Date d = stringToDate(dateString);
 	DateMapNode *node = search(root, d);

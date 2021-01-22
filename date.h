@@ -26,6 +26,13 @@ void printDate(Date date) {
 	printf("%d/%d/%d", date.year, date.month, date.day);
 }
 
+Date getTodaysDate() {
+	time_t t = time(NULL);
+	struct tm *tm = localtime(&t);
+	Date d = {tm->tm_mday, tm->tm_mon, tm->tm_year+1900};
+	return d;
+}
+
 // string of the format dd/mm/yyyy
 Date stringToDate(char *s) {
 	Date d = {0};
